@@ -1,0 +1,17 @@
+---
+controller_projects:
+  - name: "Parcheo Linux"
+    organization: "Torre-Linux"
+    scm_type: "git"
+    scm_url: "https://github.com/ansible/ansible-examples.git"
+    scm_branch: "master"
+    scm_update_on_launch: true
+    description: "Playbooks de parcheo y actualización RHEL"
+
+  - name: "Hardening RHEL"
+    organization: "Torre-Linux"
+    scm_type: "git"
+    scm_url: "https://github.com/ansible/ansible-examples.git"
+    scm_branch: "master"
+    scm_update_on_launch: false
+    description: "Roles de hardening CIS para RHEL"

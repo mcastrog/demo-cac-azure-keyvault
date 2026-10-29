@@ -1,0 +1,17 @@
+---
+controller_inventories:
+  - name: "Windows Produccion"
+    organization: "Torre-Windows"
+    description: "Servidores Windows de producción"
+
+controller_hosts:
+  - name: "win-prod-01.acme.local"
+    inventory: "Windows Produccion"
+    variables:
+      ansible_host: "10.30.1.11"
+      ansible_connection: winrm
+  - name: "win-prod-02.acme.local"
+    inventory: "Windows Produccion"
+    variables:
+      ansible_host: "10.30.1.12"
+      ansible_connection: winrm

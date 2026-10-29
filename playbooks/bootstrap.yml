@@ -1,0 +1,26 @@
+---
+- name: "CaC - Bootstrap: recrea la maquinaria del CaC en AAP"
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars_files:
+    - ../gobierno/organizations.yml
+    - ../gobierno/bootstrap.yml
+
+  vars:
+    aap_hostname: "{{ controller_host }}"
+    aap_username: "{{ controller_user }}"
+    aap_password: "{{ controller_pass }}"
+    aap_validate_certs: false
+
+  roles:
+    - role: infra.aap_configuration.dispatch
+
+  post_tasks:
+    - name: "Bootstrap completado"
+      ansible.builtin.debug:
+        msg: >-
+          Bootstrap OK. Registra el webhook del repositorio con la URL y la
+          clave que muestra el workflow "CaC - Despliegue Completo" en su
+          pestaña Details. A partir de ahí, cada push ejecuta el CaC completo.

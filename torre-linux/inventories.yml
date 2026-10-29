@@ -1,0 +1,45 @@
+---
+controller_inventories:
+  - name: "Linux Produccion"
+    organization: "Torre-Linux"
+    description: "Servidores Linux de producción"
+  - name: "Linux Pre-Produccion"
+    organization: "Torre-Linux"
+    description: "Servidores Linux de pre-producción"
+
+controller_hosts:
+  - name: "web-prod-01.acme.local"
+    inventory: "Linux Produccion"
+    variables:
+      ansible_host: "10.10.1.11"
+  - name: "web-prod-02.acme.local"
+    inventory: "Linux Produccion"
+    variables:
+      ansible_host: "10.10.1.12"
+  - name: "db-prod-01.acme.local"
+    inventory: "Linux Produccion"
+    variables:
+      ansible_host: "10.10.2.11"
+      oracle_sid: "PROD01"
+  - name: "web-pre-01.acme.local"
+    inventory: "Linux Pre-Produccion"
+    variables:
+      ansible_host: "10.20.1.11"
+
+controller_groups:
+  - name: "webservers"
+    inventory: "Linux Produccion"
+    description: "Servidores web Apache/Nginx"
+    hosts:
+      - "web-prod-01.acme.local"
+      - "web-prod-02.acme.local"
+  - name: "dbservers"
+    inventory: "Linux Produccion"
+    description: "Servidores de base de datos Oracle/PostgreSQL"
+    hosts:
+      - "db-prod-01.acme.local"
+  - name: "webservers"
+    inventory: "Linux Pre-Produccion"
+    description: "Servidores web pre-producción"
+    hosts:
+      - "web-pre-01.acme.local"

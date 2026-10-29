@@ -1,0 +1,11 @@
+---
+controller_inventories:
+  - name: "Cloud Produccion"
+    organization: "Torre-Cloud"
+    description: "Infraestructura Cloud de producción"
+
+controller_hosts:
+  - name: "vcenter.acme.local"
+    inventory: "Cloud Produccion"
+    variables:
+      ansible_host: "10.50.1.10"

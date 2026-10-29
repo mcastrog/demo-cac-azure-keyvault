@@ -1,0 +1,11 @@
+---
+controller_templates:
+  - name: "Provision VMs vCenter"
+    organization: "Torre-Cloud"
+    project: "Gestion VMware"
+    playbook: "lamp_simple/site.yml"
+    inventory: "Cloud Produccion"
+    credentials:
+      - "vCenter Corporativo"
+    description: "Provisionar VMs — credencial via Azure Key Vault"
+    ask_limit_on_launch: true

@@ -1,0 +1,122 @@
+---
+bootstrap_cac_repo: "git@github.com:ORGANIZACION/REPOSITORIO-CAC.git"
+
+bootstrap_ee_image: "REGISTRO/ee-cac-dispatch:2.6.1"
+
+controller_credential_types:
+  # El bootstrap necesita una credencial de este tipo para conectarse a AAP,
+  # así que la primera vez se crea a mano con esta misma definición. A partir
+  # de ahí queda declarada aquí y el bootstrap la mantiene.
+  - name: "CaC - AAP API"
+    kind: cloud
+    description: "Conexión del CaC a AAP"
+    inputs:
+      fields:
+        - id: hostname
+          type: string
+          label: AAP URL
+        - id: username
+          type: string
+          label: Username
+        - id: password
+          type: string
+          label: Password
+          secret: true
+      required:
+        - hostname
+        - username
+        - password
+    injectors:
+      extra_vars:
+        controller_host: !unsafe "{{ hostname }}"
+        controller_user: !unsafe "{{ username }}"
+        controller_pass: !unsafe "{{ password }}"
+
+controller_execution_environments:
+  - name: "EE CaC Dispatch"
+    image: "{{ bootstrap_ee_image }}"
+    pull: missing
+    description: "EE con infra.aap_configuration para CaC con dispatch"
+
+controller_inventories:
+  # Los playbooks del CaC se ejecutan contra localhost: este inventario solo
+  # tiene que existir para que los job templates puedan referenciarlo.
+  - name: "CaC - Localhost"
+    organization: "Default"
+    description: "Inventario de servicio para los job templates del propio CaC"
+
+controller_projects:
+  - name: "CaC - Azure Key Vault"
+    organization: "Default"
+    scm_type: git
+    scm_url: "{{ bootstrap_cac_repo }}"
+    scm_branch: main
+    credential: "GitHub - CaC Read Only"
+    scm_update_on_launch: true
+    description: "Repo CaC con credenciales resueltas desde Azure Key Vault"
+    wait: true
+
+controller_templates:
+  # La conexión a AAP llega en runtime desde la credencial "CaC - AAP API".
+  # No ponerla en extra_vars: el bootstrap resolvería la plantilla y guardaría
+  # la password en claro en el job template y en cada job.
+  - name: "CaC - Gobierno"
+    organization: "Default"
+    project: "CaC - Azure Key Vault"
+    playbook: "playbooks/site_gobierno.yml"
+    inventory: "CaC - Localhost"
+    execution_environment: "EE CaC Dispatch"
+    credentials:
+      - "CaC - AAP API"
+
+  - name: "CaC - Torre Linux"
+    organization: "Default"
+    project: "CaC - Azure Key Vault"
+    playbook: "playbooks/site_torre.yml"
+    inventory: "CaC - Localhost"
+    execution_environment: "EE CaC Dispatch"
+    extra_vars:
+      torre: "torre-linux"
+    credentials:
+      - "CaC - AAP API"
+
+  - name: "CaC - Torre Windows"
+    organization: "Default"
+    project: "CaC - Azure Key Vault"
+    playbook: "playbooks/site_torre.yml"
+    inventory: "CaC - Localhost"
+    execution_environment: "EE CaC Dispatch"
+    extra_vars:
+      torre: "torre-windows"
+    credentials:
+      - "CaC - AAP API"
+
+  - name: "CaC - Torre Cloud"
+    organization: "Default"
+    project: "CaC - Azure Key Vault"
+    playbook: "playbooks/site_torre.yml"
+    inventory: "CaC - Localhost"
+    execution_environment: "EE CaC Dispatch"
+    extra_vars:
+      torre: "torre-cloud"
+    credentials:
+      - "CaC - AAP API"
+
+controller_workflows:
+  - name: "CaC - Despliegue Completo"
+    organization: "Default"
+    description: "Push a git → webhook → gobierno + 3 torres en paralelo"
+    webhook_service: github
+    simplified_workflow_nodes:
+      - identifier: gobierno
+        unified_job_template: "CaC - Gobierno"
+        success_nodes:
+          - torre-linux
+          - torre-windows
+          - torre-cloud
+      - identifier: torre-linux
+        unified_job_template: "CaC - Torre Linux"
+      - identifier: torre-windows
+        unified_job_template: "CaC - Torre Windows"
+      - identifier: torre-cloud
+        unified_job_template: "CaC - Torre Cloud"

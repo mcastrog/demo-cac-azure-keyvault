@@ -1,0 +1,11 @@
+---
+controller_templates:
+  - name: "Patch Windows Produccion"
+    organization: "Torre-Windows"
+    project: "Gestion Windows"
+    playbook: "lamp_simple/site.yml"
+    inventory: "Windows Produccion"
+    credentials:
+      - "Windows Produccion"
+    description: "Parcheo mensual Windows — credencial via Azure Key Vault"
+    ask_limit_on_launch: true

@@ -1,0 +1,17 @@
+---
+- name: "CaC - Gobierno: organizaciones y equipos"
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars_files:
+    - ../gobierno/organizations.yml
+
+  vars:
+    aap_hostname: "{{ controller_host }}"
+    aap_username: "{{ controller_user }}"
+    aap_password: "{{ controller_pass }}"
+    aap_validate_certs: false
+
+  roles:
+    - role: infra.aap_configuration.dispatch

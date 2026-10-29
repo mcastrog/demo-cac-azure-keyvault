@@ -1,0 +1,17 @@
+FROM registry.redhat.io/ansible-automation-platform-26/ee-supported-rhel9:latest
+
+USER root
+
+RUN ansible-galaxy collection install \
+    infra.aap_configuration:==3.9.0 \
+    infra.aap_configuration_extended:==3.0.2 \
+    --collections-path /usr/share/ansible/collections
+
+# filetree_create uses yq to rewrite its exported YAML files.
+RUN curl --fail --location --silent --show-error \
+      https://github.com/mikefarah/yq/releases/download/v4.47.1/yq_linux_amd64 \
+      --output /usr/local/bin/yq && \
+    echo '0fb28c6680193c41b364193d0c0fc4a03177aecde51cfc04d506b1517158c2fb  /usr/local/bin/yq' | sha256sum --check && \
+    chmod 0755 /usr/local/bin/yq
+
+USER 1000
